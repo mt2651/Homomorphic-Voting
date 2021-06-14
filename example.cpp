@@ -2,7 +2,96 @@
 #include <libhcs.h> // master header includes everything
 #include <iostream>
 #include <vector>
+#include <fstream>
+#include <gmpxx.h>
 using namespace std;
+
+void savePublicKey(pcs_public_key *pk)
+{
+    ofstream ofs("publicKey.key");
+
+    ofs << pk->g;
+    ofs << "\n";
+    ofs << pk->n2;
+    ofs << "\n";
+    ofs << pk->n;
+
+    ofs.close();
+}  
+
+void savePrivateKey(pcs_private_key *vk)
+{
+    ofstream ofs("privateKey.key");
+
+    ofs << vk->hp;
+    ofs << "\n";
+    ofs << vk->hq;
+    ofs << "\n";
+    ofs << vk->lambda;
+    ofs << "\n";
+    ofs << vk->mu;
+    ofs << "\n";
+    ofs << vk->n2;
+    ofs << "\n";
+    ofs << vk->n;
+    ofs << "\n";
+    ofs << vk->p2;
+    ofs << "\n";
+    ofs << vk->p;
+    ofs << "\n";
+    ofs << vk->q2;
+    ofs << "\n";
+    ofs << vk->q;
+
+    ofs.close();
+}
+
+pcs_public_key* loadPublicKey()
+{
+    pcs_public_key *pk = pcs_init_public_key();
+    ifstream ofs("publicKey.key");
+
+    ofs >> pk->g;
+    // ofs << "\n";
+    ofs >> pk->n2;
+    // ofs << "\n";
+    ofs >> pk->n;
+
+    ofs.close();
+
+    return pk;
+}
+
+pcs_private_key* loadPrivateKey()
+{
+    pcs_private_key *vk = pcs_init_private_key();
+
+    ifstream ofs("privateKey.key");
+
+    ofs >> vk->hp;
+    // ofs << "\n";
+    ofs >> vk->hq;
+    // ofs << "\n";
+    ofs >> vk->lambda;
+    // ofs << "\n";
+    ofs >> vk->mu;
+    // ofs << "\n";
+    ofs >> vk->n2;
+    // ofs << "\n";
+    ofs >> vk->n;
+    // ofs << "\n";
+    ofs >> vk->p2;
+    // ofs << "\n";
+    ofs >> vk->p;
+    // ofs << "\n";
+    ofs >> vk->q2;
+    // ofs << "\n";
+    ofs >> vk->q;
+
+    ofs.close();
+    return vk;
+}
+
 
 int main(void)
 {
@@ -15,10 +104,17 @@ int main(void)
     int keySize;
     cout << "Enter size of key you want (1024, 2048, 3072 bits): ";
     cin >> keySize; 
-    pcs_generate_key_pair(pk, vk, hr, keySize);
+    
+    // pcs_generate_key_pair(pk, vk, hr, keySize);
+    // savePrivateKey(vk);
+    // savePublicKey(pk);
+    
+    pk = loadPublicKey();
+    vk = loadPrivateKey();
+
+    // mpz_t p, q, g, n, mu, lambda;
 
     /*Key information*/
-    
     gmp_printf("p = %Zd\nq = %Zd\n", vk->p, vk->q);
     gmp_printf("====================\n");
     gmp_printf("Public key (n, g):\n");
@@ -27,6 +123,14 @@ int main(void)
     gmp_printf("Private key (gMu, lambda):\n");
     gmp_printf("gMu = %Zd\ngLambda = %Zd\n", vk->mu, vk->lambda);
     gmp_printf("====================\n");
+
+    // cout << pk->g;
+
+    ofstream pub("publicKey.txt");
+    pub << pk->g;
+    pub << "\n";
+    pub << pk->n;
+    pub.close();
 
     /*Voting Process*/
     int numCandidates;

@@ -126,12 +126,6 @@ int main(void)
 
     // cout << pk->g;
 
-    ofstream pub("publicKey.txt");
-    pub << pk->g;
-    pub << "\n";
-    pub << pk->n;
-    pub.close();
-
     /*Voting Process*/
     int numCandidates;
     cout << "Number of Candidates: ";

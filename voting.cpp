@@ -6,14 +6,6 @@
 #include <gmpxx.h>
 using namespace std;
 
-struct result
-{
-    mpz_t rs1;
-    mpz_t rs2;
-    mpz_t rs3;
-    mpz_t rs4;
-    mpz_t rs5;
-} result;
 
 void savePublicKey(pcs_public_key *pk)
 {
@@ -165,38 +157,49 @@ void Vote(pcs_public_key* pk)
     vector<mpz_t> finalResult(numCandidates);
     vector<string> result;
     result = loadElectionResult();
+    char* chr;
     for (int i=0; i<5; ++i)
     {   
         mpz_t a;
-        char *chr = &result[i][0];
+        chr = &result[i][0];
         mpz_set_str(a, chr, 10);
         mpz_set(finalResult[i], a);
     }
+    delete chr;
+
+
+    int numVoters;
+    cout << "Number of Voters: ";
+    cin >> numVoters;
 
     // cout << "================\n";
     cout << "Rule: A voter is just allowed to vote once for only one Candidate!!\n";
     // doi lai thanh 1 la dong y, 0 la khong dong y di, con bau cho bao nhieu nguoi cung dc
     cout << "Election is ready!\n";
     cout << "================\n";
-    cout << "Enter selection ";
+    // cout << "Enter selection ";
 
     vector<mpz_t> vote(numCandidates);
     vector<mpz_t> encVote(numCandidates);
-    for (int j = 0; j < numCandidates; j++)
+    for (int i = 0; i < numVoters; i++)
     {
-        int x;
-        cin >> x;
-        mpz_set_ui(vote[j], x);
-        hcs_random *r = hcs_init_random(); // random r value
-        pcs_encrypt(pk, r, encVote[j], vote[j]);
-        pcs_ee_add(pk, finalResult[j], finalResult[j],encVote[j]);
-        hcs_free_random(r);
-    }
+        cout << "\nVoters " << i+1 << ": ";
+        for (int j = 0; j < numCandidates; j++)
+        {
+            int x;
+            cin >> x;
+            mpz_set_ui(vote[j], x);
+            hcs_random *r = hcs_init_random(); // random r value
+            pcs_encrypt(pk, r, encVote[j], vote[j]);
+            pcs_ee_add(pk, finalResult[j], finalResult[j],encVote[j]);
+            hcs_free_random(r);
+        }
 
-    cout << "\nEncrypted Vote " << ": \n\n";
-    for (int j = 0; j < numCandidates; j++)
-    {
-        gmp_printf("Candidate %d: %Zd\n\n",j+1, encVote[j]);
+        cout << "\nEncrypted Vote " << i+1 << ": \n\n";
+        for (int j = 0; j < numCandidates; j++)
+        {
+            gmp_printf("Candidate %d: %Zd\n\n",j+1, encVote[j]);
+        }       
     }
 
     vector<string> new_str;
@@ -206,7 +209,21 @@ void Vote(pcs_public_key* pk)
         new_str.push_back(a);
     }
 
+    cout << "The election is successful, the results are saved in file 'resultElection.txt' ";
+
     saveElectionResult(new_str);
+
+    finalResult.clear();
+    result.clear();
+    vote.clear();
+    encVote.clear();
+    new_str.clear();
+
+    // finalResult.erase(finalResult.begin(), finalResult.end());
+    // result.erase(result.begin(), result.end());
+    // vote.erase(vote.begin(), vote.end());
+    // encVote.erase(encVote.begin(), encVote.end());
+    // new_str.erase(new_str.begin(), new_str.end());
 }
 
 void Result(pcs_private_key* vk)
@@ -221,6 +238,8 @@ void Result(pcs_private_key* vk)
         char *chr = &result[i][0];
         mpz_set_str(a, chr, 10);
         mpz_set(finalResult[i], a);
+        // delete chr;
+        // delete a;
     }
 
     cout << "Encrypted final result:\n";
@@ -237,6 +256,11 @@ void Result(pcs_private_key* vk)
         pcs_decrypt(vk, finalResult[i], finalResult[i]);
         gmp_printf("%Zd ", finalResult[i]);
     }
+
+    finalResult.clear();
+    result.clear();    
+    // finalResult.resize(0);
+    result.resize(0);
 }
 
 
@@ -259,35 +283,33 @@ int main(void)
     vk = loadPrivateKey();
 
     int mode;
-    do
-    {
-        cout << "1: Infomation key" << endl;
-        cout << "2: Vote" << endl;
-        cout << "3: View Result" << endl;
-        cout << "0: Exit" << endl;
-        cout << "Enter mode: ";
-        cin >> mode;
-        cout << "=====================" << endl;
-        
-        switch (mode)
-        {
-        case 1:
-            InfomationKey(vk, pk);
-            break;
-        
-        case 2:
-            Vote(pk);
-            break;
 
-        case 3:
-            Result(vk);
-            break;
-
-        default:
-            break;
-        }
-    } while (mode != 0);
+    cout << "1: Infomation key" << endl;
+    cout << "2: Vote" << endl;
+    cout << "3: View Result" << endl;
+    cout << "0: Exit" << endl;
+    cout << "Enter mode: ";
+    cin >> mode;
+    cout << "=====================" << endl;
     
+    switch (mode)
+    {
+    case 1:
+        InfomationKey(vk, pk);
+        break;
+    
+    case 2:
+        Vote(pk);
+        break;
+
+    case 3:
+        Result(vk);
+        break;
+
+    default:
+        break;
+    }
+
 
     // InfomationKey(vk, pk);
 

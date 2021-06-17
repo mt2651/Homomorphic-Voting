@@ -156,7 +156,25 @@ void Vote(pcs_public_key* pk)
     int numCandidates = 5;
     vector<mpz_t> finalResult(numCandidates);
     vector<string> result;
-    result = loadElectionResult();
+    try
+    {
+        result = loadElectionResult();
+    }
+    catch(...)
+    {
+        hcs_random *hr = hcs_init_random(); // random r value
+        vector<string> init;
+        for(int i = 0; i < numCandidates; ++i)
+        {
+            mpz_set_ui(finalResult[i],0);
+            pcs_encrypt(pk, hr, finalResult[i], finalResult[i]);
+            string a = mpz_get_str(NULL, 10, finalResult[i]);
+            init.push_back(a);
+        }
+        saveElectionResult(init);
+        result = loadElectionResult();
+        hcs_free_random(hr);
+    }
     char* chr;
     for (int i=0; i<5; ++i)
     {   
@@ -269,7 +287,6 @@ int main(void)
     // initialize data structures
     pcs_public_key *pk = pcs_init_public_key(); //public key
     pcs_private_key *vk = pcs_init_private_key(); // private key
-    hcs_random *hr = hcs_init_random(); // random r value
 
     // Generate a key pair with modulus of selected size
     int keySize = 3072;
@@ -322,7 +339,6 @@ int main(void)
     // Cleanup all data
     pcs_free_public_key(pk);
     pcs_free_private_key(vk);
-    hcs_free_random(hr);
 
     return 0;
 }

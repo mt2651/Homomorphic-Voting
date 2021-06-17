@@ -138,16 +138,20 @@ void saveElectionResult(vector<string> result)
 
 }
 
-vector<string> loadElectionResult()
+bool loadElectionResult(vector<string> &result)
 {
-    vector<string> result;
     ifstream ifs("resultElection.txt");
+    if(!ifs)
+        return 0;
+
     string str;
     while(getline(ifs, str))
     {
         result.push_back(str);
     }
-    return result;
+    ifs.close();
+
+    return 1;
 }
 
 void Vote(pcs_public_key* pk)
@@ -156,35 +160,32 @@ void Vote(pcs_public_key* pk)
     int numCandidates = 5;
     vector<mpz_t> finalResult(numCandidates);
     vector<string> result;
-    try
+    
+
+    bool openF = loadElectionResult(result);
+    if(openF)
     {
-        result = loadElectionResult();
+        char* chr;
+        for (int i=0; i<5; ++i)
+        {   
+            mpz_t a;
+            chr = &result[i][0];
+            mpz_set_str(a, chr, 10);
+            mpz_set(finalResult[i], a);
+        }
+        delete chr;
     }
-    catch(...)
+    else
     {
-        hcs_random *hr = hcs_init_random(); // random r value
-        vector<string> init;
+        cout << "Not exist file 'resultElection'!\nStart new voting" << endl;
+        vector<mpz_t> finalResult(numCandidates);
         for(int i = 0; i < numCandidates; ++i)
         {
+            hcs_random *hr = hcs_init_random(); // random r value
             mpz_set_ui(finalResult[i],0);
             pcs_encrypt(pk, hr, finalResult[i], finalResult[i]);
-            string a = mpz_get_str(NULL, 10, finalResult[i]);
-            init.push_back(a);
         }
-        saveElectionResult(init);
-        result = loadElectionResult();
-        hcs_free_random(hr);
     }
-    char* chr;
-    for (int i=0; i<5; ++i)
-    {   
-        mpz_t a;
-        chr = &result[i][0];
-        mpz_set_str(a, chr, 10);
-        mpz_set(finalResult[i], a);
-    }
-    delete chr;
-
 
     int numVoters;
     cout << "Number of Voters: ";
@@ -249,7 +250,12 @@ void Result(pcs_private_key* vk)
     int numCandidates = 5;
     vector<mpz_t> finalResult(numCandidates);
     vector<string> result;
-    result = loadElectionResult();
+    bool openF = loadElectionResult(result);
+    if(!openF)
+    {
+        cout << "File 'resultElection' not exist!" << endl;
+        return;
+    }
     for (int i=0; i<5; ++i)
     {   
         mpz_t a;

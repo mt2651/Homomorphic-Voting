@@ -43,26 +43,28 @@ int main()
     hcs_random *hr = hcs_init_random(); // random r value
 
     // Generate a key pair with modulus of selected size
-    //int keySize;
-    //cout << "Enter size of key you want (1024, 2048, 3072 bits): ";
-    //cin >> keySize; 
-    pcs_generate_key_pair(pk, vk, hr, 3072);
+    int keySize;
+    cout << "Enter size of key you want (1024, 2048, 3072 bits): ";
+    cin >> keySize; 
+    pcs_generate_key_pair(pk, vk, hr, keySize);
 
-     /*Key information*/
-    gmp_printf("p = %Zd\nq = %Zd\n", vk->p, vk->q);
-    gmp_printf("====================\n");
-    gmp_printf("Public key (n, g):\n");
-    gmp_printf("g = %Zd\nn = %Zd\n", pk->g, pk->n);
-    gmp_printf("====================\n");
-    gmp_printf("Private key (gMu, lambda):\n");
-    gmp_printf("gMu = %Zd\ngLambda = %Zd\n", vk->mu, vk->lambda);
-    gmp_printf("====================\n");
+    //  /*Key information*/
+    // gmp_printf("p = %Zd\nq = %Zd\n", vk->p, vk->q);
+    // gmp_printf("====================\n");
+    // gmp_printf("Public key (n, g):\n");
+    // gmp_printf("g = %Zd\nn = %Zd\n", pk->g, pk->n);
+    // gmp_printf("====================\n");
+    // gmp_printf("Private key (gMu, lambda):\n");
+    // gmp_printf("gMu = %Zd\ngLambda = %Zd\n", vk->mu, vk->lambda);
+    // gmp_printf("====================\n");
+
+    cout << "Performance with key size " << keySize << " bits" << endl;
 
     //Estimate Performance
     hcs_random *r = hcs_init_random(); // random r value
     mpz_set_ui(encTest,0);
     pcs_encrypt(pk, r, encTest, encTest);
-    gmp_printf("%Zd\n", encTest);
+    // gmp_printf("%Zd\n", encTest);
     
     TimeEncrypt(pk);
     TimeDecrypt(vk);

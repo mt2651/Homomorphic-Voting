@@ -10,29 +10,60 @@ void TimeEncrypt(pcs_public_key* pk)
 {
     double time_enc = 0;
     hcs_random *r = hcs_init_random(); // random r value
-    int time_start = clock();
-    mpz_t test;
-    mpz_set_ui(test,1);
-    pcs_encrypt(pk, r, test, test);
-    pcs_ee_add(pk, encTest, encTest, test);
-    int time_end = clock();
-    time_enc += (time_end - time_start) % CLOCKS_PER_SEC;
-    cout << "Total PHE Encryption Time (1 round): " << time_enc << " s\n";
+    for (int i = 0; i < 100; i++)
+    {
+        int time_start = clock();
+        // cout << time_start <<endl;
+        mpz_t test;
+        mpz_set_ui(test,1);
+        pcs_encrypt(pk, r, test, test);
+        int time_end = clock();
+        // hcs_free_random(r);
+        time_enc += (time_end - time_start)/double(CLOCKS_PER_SEC)*1000;
+    }
+    // cout << time_end <<endl;
+    cout << "Average PHE Encryption Time (100 round): " << time_enc/100 << " ms\n";
     //cout << "Average PHE Encryption Time (1 round): " << time_enc/2 << " mus\n";
     hcs_free_random(r);
+
+}
+
+
+void TimeAddition(pcs_public_key* pk)
+{
+    double time_add = 0;
+    hcs_random *r = hcs_init_random(); // random r value
+    mpz_t test;
+    for (int i = 0; i < 100; i++)
+    {
+        mpz_set_ui(test,1);
+        pcs_encrypt(pk, r, test, test);
+        int time_start = clock();
+        pcs_ee_add(pk, encTest, encTest, test);
+        int time_end = clock();
+        // time_enc += (time_end - time_start) % CLOCKS_PER_SEC;
+        time_add += (time_end - time_start)/double(CLOCKS_PER_SEC)*1000;
+    }
+    cout << "Average PHE Addition Time (1 round): " << time_add/100 << " ms\n";
+    //cout << "Average PHE Encryption Time (1 round): " << time_enc/2 << " mus\n";
+    hcs_free_random(r);
+
 }
 
 void TimeDecrypt(pcs_private_key* vk)
 {
     double time_dec = 0;
     mpz_t finalTest;
-    int time_start = clock();
-    pcs_decrypt(vk, finalTest, encTest);
-    int time_end = clock();
-    time_dec += (time_end - time_start) % CLOCKS_PER_SEC;
-    cout << "Final Test Result: ";
-    gmp_printf("%Zd\n", finalTest);
-    cout << "Total PHE Decryption Time (1 round): " << time_dec << " s\n";
+    for(int i = 0; i < 100; i++)
+    {
+        int time_start = clock();
+        pcs_decrypt(vk, finalTest, encTest);
+        int time_end = clock();
+        time_dec += (time_end - time_start)/double(CLOCKS_PER_SEC)*1000;
+    }
+    // cout << "Final Test Result: ";
+    // gmp_printf("%Zd\n", finalTest);
+    cout << "Average PHE Decryption Time (100 round): " << time_dec/100 << " ms\n";
     //cout << "Average PHE Decryption Time (1 round): " << time_dec/2 << " mus\n";
 }
 
@@ -67,6 +98,7 @@ int main()
     // gmp_printf("%Zd\n", encTest);
     
     TimeEncrypt(pk);
+    TimeAddition(pk);
     TimeDecrypt(vk);
     
     // Cleanup all data

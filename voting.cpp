@@ -213,7 +213,7 @@ void InfomationKey(pcs_private_key* vk, pcs_public_key* pk)
     /*Key information*/
     gmp_printf("p = %Zd\nq = %Zd\n", vk->p, vk->q);
     gmp_printf("====================\n");
-    gmp_printf("Public key (n, g):\n");
+    gmp_printf("Public key (g, n):\n");
     gmp_printf("g = %Zd\nn = %Zd\n", pk->g, pk->n);
     gmp_printf("====================\n");
     gmp_printf("Private key (gMu, lambda):\n");

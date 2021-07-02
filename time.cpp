@@ -10,7 +10,7 @@ void TimeEncrypt(pcs_public_key* pk)
 {
     double time_enc = 0;
     hcs_random *r = hcs_init_random(); // random r value
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 10000; i++)
     {
         int time_start = clock();
         // cout << time_start <<endl;
@@ -22,7 +22,7 @@ void TimeEncrypt(pcs_public_key* pk)
         time_enc += (time_end - time_start)/double(CLOCKS_PER_SEC)*1000;
     }
     // cout << time_end <<endl;
-    cout << "Average PHE Encryption Time (100 round): " << time_enc/100 << " ms\n";
+    cout << "Average PHE Encryption Time (10000 round): " << time_enc/10000 << " ms\n";
     //cout << "Average PHE Encryption Time (1 round): " << time_enc/2 << " mus\n";
     hcs_free_random(r);
 
@@ -34,7 +34,7 @@ void TimeAddition(pcs_public_key* pk)
     double time_add = 0;
     hcs_random *r = hcs_init_random(); // random r value
     mpz_t test;
-    for (int i = 0; i < 100; i++)
+    for (int i = 0; i < 10000; i++)
     {
         mpz_set_ui(test,1);
         pcs_encrypt(pk, r, test, test);
@@ -44,7 +44,7 @@ void TimeAddition(pcs_public_key* pk)
         // time_enc += (time_end - time_start) % CLOCKS_PER_SEC;
         time_add += (time_end - time_start)/double(CLOCKS_PER_SEC)*1000;
     }
-    cout << "Average PHE Addition Time (1 round): " << time_add/100 << " ms\n";
+    cout << "Average PHE Addition Time (10000 round): " << time_add/10000 << " ms\n";
     //cout << "Average PHE Encryption Time (1 round): " << time_enc/2 << " mus\n";
     hcs_free_random(r);
 
@@ -54,7 +54,7 @@ void TimeDecrypt(pcs_private_key* vk)
 {
     double time_dec = 0;
     mpz_t finalTest;
-    for(int i = 0; i < 100; i++)
+    for(int i = 0; i < 10000; i++)
     {
         int time_start = clock();
         pcs_decrypt(vk, finalTest, encTest);
@@ -63,7 +63,7 @@ void TimeDecrypt(pcs_private_key* vk)
     }
     // cout << "Final Test Result: ";
     // gmp_printf("%Zd\n", finalTest);
-    cout << "Average PHE Decryption Time (100 round): " << time_dec/100 << " ms\n";
+    cout << "Average PHE Decryption Time (100 round): " << time_dec/10000 << " ms\n";
     //cout << "Average PHE Decryption Time (1 round): " << time_dec/2 << " mus\n";
 }
 

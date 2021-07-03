@@ -6,6 +6,7 @@ using namespace std;
 
 mpz_t encTest;
 
+/* Time performance in 10000 rounds */
 void TimeEncrypt(pcs_public_key* pk);
 void TimeDecrypt(pcs_private_key* vk);
 void TimeAddition(pcs_public_key* pk);
@@ -55,7 +56,7 @@ void TimeEncrypt(pcs_public_key* pk)
         int time_end = clock();
         time_enc += (time_end - time_start)/double(CLOCKS_PER_SEC)*1000;
     }
-    cout << "Average PHE Encryption Time (10000 round): " << time_enc/10000 << " ms\n";
+    cout << "Average PHE Encryption Time: " << time_enc/10000 << " ms\n";
     hcs_free_random(r);
 
 }
@@ -75,7 +76,7 @@ void TimeAddition(pcs_public_key* pk)
         int time_end = clock();
         time_add += (time_end - time_start)/double(CLOCKS_PER_SEC)*1000;
     }
-    cout << "Average PHE Addition Time (10000 round): " << time_add/10000 << " ms\n";
+    cout << "Average PHE Addition Time: " << time_add/10000 << " ms\n";
     hcs_free_random(r);
 
 }
@@ -92,5 +93,5 @@ void TimeDecrypt(pcs_private_key* vk)
         time_dec += (time_end - time_start)/double(CLOCKS_PER_SEC)*1000;
     }
 
-    cout << "Average PHE Decryption Time (10000 round): " << time_dec/10000 << " ms\n";
+    cout << "Average PHE Decryption Time: " << time_dec/10000 << " ms\n";
 }

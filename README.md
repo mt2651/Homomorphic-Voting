@@ -11,7 +11,7 @@ make
 sudo make install # Will install to /usr/local by default
 
 
-# To run this project, we need only need to link against libhcs and libgmp:
+To run this project, we need only need to link against libhcs and libgmp:
 
 2) Installation voting
 
